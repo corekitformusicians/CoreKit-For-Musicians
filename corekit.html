@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CoreKit For Musicians – Practice Toolkit</title>
+<meta name="description" content="CoreKit For Musicians is a free practice toolkit with a metronome, tuner, drone, pitch detector, tempo ramp trainer, practice timer and log, plus stories of great musicians.">
+<meta property="og:title" content="CoreKit For Musicians"><meta property="og:description" content="Free metronome, tuner, drone, pitch detector, tempo ramp, practice timer and log, with stories of great musicians."><meta property="og:type" content="website">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+
+<style>
+:root{--bg:#eef3fa;--panel:#fff;--panel2:#e4ebf6;--ink:#10213a;--mute:#5d6f8c;--acc:#e8870e;--acc2:#0e9f8a;--line:#d3ddee;--shadow:0 20px 50px -25px rgba(16,33,58,.35)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1829;--panel:#15253e;--panel2:#1d3254;--ink:#eaf1ff;--mute:#8fa4c7;--acc:#ffb347;--acc2:#5ce1c8;--line:#27406a;--shadow:0 20px 50px -25px #000}}
+:root[data-theme="dark"]{--bg:#0d1829;--panel:#15253e;--panel2:#1d3254;--ink:#eaf1ff;--mute:#8fa4c7;--acc:#ffb347;--acc2:#5ce1c8;--line:#27406a;--shadow:0 20px 50px -25px #000}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;min-height:100vh;transition:background .4s,color .4s}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(60% 40% at 80% -5%,color-mix(in srgb,var(--acc) 22%,transparent),transparent),radial-gradient(50% 40% at 0% 100%,color-mix(in srgb,var(--acc2) 18%,transparent),transparent)}
+.wrap{position:relative;max-width:760px;margin:0 auto;padding:22px 18px 60px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.logo{flex:none;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:grid;place-items:center;box-shadow:var(--shadow)}
+.logo svg{width:34px;height:34px;overflow:visible}
+.logo .eq line{transform-box:fill-box;transform-origin:center;animation:eq 1.6s ease-in-out infinite}
+.logo .eq line:nth-child(2){animation-delay:-.5s}.logo .eq line:nth-child(3){animation-delay:-1s}
+.logo:hover .eq line{animation-duration:.6s}
+@keyframes eq{50%{transform:scaleY(.45)}}
+h1{font-size:clamp(18px,5.4vw,26px);line-height:1.1;font-weight:800;margin:0;letter-spacing:-.5px}
+header p{margin:0;color:var(--mute);font-size:14px}
+.grow{flex:1}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+.icon-btn{width:42px;height:42px;border-radius:12px;background:var(--panel);display:grid;place-items:center;border:1px solid var(--line);transition:transform .2s}
+.icon-btn:hover{transform:rotate(18deg)}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tabs{position:relative;display:flex;overflow-x:auto;scrollbar-width:none;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:5px;margin-bottom:18px}
+.tab{position:relative;z-index:1;flex:1 0 auto;min-width:88px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border-radius:14px;color:var(--mute);font-weight:600;font-size:13px;transition:color .3s}
+.tab[aria-selected="true"]{color:#10213a}
+.pill{position:absolute;top:5px;bottom:5px;left:0;border-radius:14px;background:linear-gradient(135deg,var(--acc),#ffd27a);transition:transform .45s cubic-bezier(.5,1.4,.5,1),width .45s cubic-bezier(.5,1.4,.5,1)}
+.panel{display:none;background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:26px 22px;box-shadow:var(--shadow)}
+.panel.on{display:block;animation:in .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes in{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+h2{margin:0 0 4px;font-size:20px}
+.sub{margin:0 0 18px;color:var(--mute);font-size:14px}
+.row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.big{font-size:84px;font-weight:800;line-height:1;letter-spacing:-3px;font-variant-numeric:tabular-nums}
+.unit{color:var(--mute);font-weight:600}
+.btn{padding:12px 20px;border-radius:14px;background:var(--panel2);font-weight:600;transition:transform .15s,background .25s}
+.btn:active{transform:scale(.94)}
+.btn:hover{background:var(--line)}
+.btn.main{background:linear-gradient(135deg,var(--acc),#ffd27a);color:#10213a;padding:14px 32px;font-size:17px;box-shadow:0 10px 24px -10px var(--acc)}
+.round{width:46px;height:46px;border-radius:50%;background:var(--panel2);font-size:22px;font-weight:600;transition:transform .15s}
+.round:active{transform:scale(.88)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:8px;background:var(--panel2);margin:18px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--acc);border:4px solid var(--panel);box-shadow:0 2px 10px rgba(0,0,0,.3);cursor:pointer;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--acc);border:4px solid var(--panel)}
+select{font:inherit;background:var(--panel2);color:var(--ink);border:0;border-radius:12px;padding:10px 12px}
+.stage{display:flex;justify-content:center;margin:6px 0 4px}
+.beats{display:flex;gap:10px;justify-content:center;margin:14px 0}
+.dot{width:18px;height:18px;border-radius:50%;background:var(--panel2);transition:transform .12s,background .12s,box-shadow .12s}
+.dot.hit{transform:scale(1.5);background:var(--acc2);box-shadow:0 0 16px var(--acc2)}
+.dot.hit.first{background:var(--acc);box-shadow:0 0 16px var(--acc)}
+#arm{transform-origin:100px 190px;transition:transform .5s ease-in-out}
+.readout{text-align:center}
+.note{font-size:92px;font-weight:800;line-height:1;transition:color .3s}
+.note.ok{color:var(--acc2);text-shadow:0 0 30px var(--acc2)}
+#needle{transform-origin:150px 150px;transition:transform .15s ease-out}
+.small{color:var(--mute);font-size:14px;margin-top:6px}
+.wheel{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 14px}
+.key{padding:18px 0;border-radius:16px;background:var(--panel2);font-weight:800;font-size:20px;transition:transform .2s,background .3s,box-shadow .3s}
+.key:hover{transform:translateY(-3px)}
+.key.on{background:linear-gradient(135deg,var(--acc2),#9af2e0);color:#10213a;box-shadow:0 0 0 0 var(--acc2);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--acc2) 55%,transparent)}100%{box-shadow:0 0 0 18px transparent}}
+.lab{display:flex;justify-content:space-between;color:var(--mute);font-size:14px;font-weight:600}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.chip{padding:8px 16px;border-radius:99px;background:var(--panel2);font-weight:600;transition:background .3s,color .3s}
+.chip.on{background:var(--acc2);color:#10213a}
+.ring{position:relative;width:240px;height:240px;margin:0 auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:14;stroke-linecap:round}
+#prog{stroke:var(--acc);transition:stroke-dashoffset .4s linear}
+.ring .t{position:absolute;inset:0;display:grid;place-items:center;font-size:52px;font-weight:800;font-variant-numeric:tabular-nums}
+.stats{display:flex;justify-content:center;gap:28px;margin-top:20px;color:var(--mute);font-size:14px}
+.stats b{display:block;font-size:24px;color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:14px;font-weight:600;transition:transform .5s cubic-bezier(.3,1.4,.5,1);z-index:9}
+.toast.show{transform:translate(-50%,0)}
+@media (max-width:480px){.big{font-size:68px}.tab span{font-size:12px}.note{font-size:76px}}
+.tabs::-webkit-scrollbar{display:none}
+.staff{position:relative;height:50px;margin:-6px 4px 18px;background:repeating-linear-gradient(to bottom,var(--line) 0 2px,transparent 2px 12px)}
+.staff i{position:absolute;font-style:normal;font-size:32px;line-height:1;color:var(--acc);animation:bob 3.2s ease-in-out infinite}
+.staff i:nth-child(even){color:var(--acc2);animation-delay:-1.4s}
+@keyframes bob{50%{transform:translateY(-8px) rotate(6deg)}}
+#snd .sl{opacity:0;transition:opacity .2s}#snd.off .sl{opacity:1}
+input.num,input.txt{font:inherit;color:var(--ink);background:var(--panel2);border:0;border-radius:12px;padding:10px 12px;width:84px}
+input.txt{flex:1;min-width:140px;width:auto}
+.f4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.f4 label{font-size:12px;color:var(--mute);font-weight:600;display:grid;gap:4px}.f4 input{width:100%}
+.bar{height:10px;border-radius:9px;background:var(--panel2);overflow:hidden;margin:16px 0 8px}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc2),var(--acc));transition:width .4s}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:150px;margin-bottom:6px}.week div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:12px;color:var(--mute)}.week i{width:70%;border-radius:8px 8px 4px 4px;background:linear-gradient(var(--acc),var(--acc2));transition:height .6s cubic-bezier(.3,1.3,.5,1)}.week b{color:var(--ink);font-size:11px;min-height:14px}
+#llist{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}#llist li{background:var(--panel2);border-radius:12px;padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}#llist em{margin-left:auto;font-style:normal;color:var(--mute);font-size:12px}
+.cards{display:grid;gap:12px}
+.chip.near{box-shadow:0 0 0 3px var(--acc)}
+#nh{font-weight:600;color:var(--ink);min-height:20px}
+.card{display:flex;gap:14px;align-items:center;text-align:left;width:100%;padding:14px;border-radius:18px;background:var(--panel2);transition:transform .25s,box-shadow .25s}.card:hover{transform:translateX(6px);box-shadow:var(--shadow)}
+.badge{flex:none;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#10213a;background:linear-gradient(135deg,var(--acc),var(--acc2))}
+.card b{display:block;font-size:17px}.card span{color:var(--mute);font-size:13px}
+.read p{line-height:1.7;font-size:16px;max-width:60ch}.take{margin-top:18px;padding:14px 16px 14px 18px;border-left:5px solid var(--acc2);background:var(--panel2);border-radius:0 14px 14px 0}
+/* black and white */
+:root{--bg:#f2f2f2;--panel:#fff;--panel2:#ececec;--ink:#000;--mute:#666;--acc:#000;--acc2:#7a7a7a;--line:#d6d6d6;--on:#fff;--shadow:0 20px 50px -28px rgba(0,0,0,.4)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--panel:#0e0e0e;--panel2:#1c1c1c;--ink:#fff;--mute:#9b9b9b;--acc:#fff;--acc2:#8c8c8c;--line:#2e2e2e;--on:#000;--shadow:0 20px 50px -28px #000}}
+:root[data-theme="dark"]{--bg:#000;--panel:#0e0e0e;--panel2:#1c1c1c;--ink:#fff;--mute:#9b9b9b;--acc:#fff;--acc2:#8c8c8c;--line:#2e2e2e;--on:#000;--shadow:0 20px 50px -28px #000}
+body::before{background:none}
+.tab[aria-selected="true"]{color:var(--on)}
+.pill,.logo,.badge{background:var(--acc)}
+.badge{color:var(--on)}
+.logo svg{stroke:var(--on)}
+.btn.main{background:var(--acc);color:var(--on);box-shadow:0 10px 24px -14px var(--acc)}
+.key.on{background:var(--acc);color:var(--on)}
+.chip.on{background:var(--acc);color:var(--on)}
+.take{border-left-color:var(--acc)}
+.note.ok{text-shadow:none;text-decoration:underline;text-underline-offset:8px}
+header .icon-btn{flex:none}
+.tour{position:fixed;inset:0;z-index:50}
+.spot{position:fixed;border-radius:18px;box-shadow:0 0 0 9999px rgba(0,0,0,.74);outline:3px solid #fff;transition:left .45s cubic-bezier(.3,1,.4,1),top .45s cubic-bezier(.3,1,.4,1),width .45s cubic-bezier(.3,1,.4,1),height .45s cubic-bezier(.3,1,.4,1)}
+.tip{position:fixed;width:min(340px,calc(100vw - 32px));background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 24px 60px -20px #000;transition:top .45s cubic-bezier(.3,1,.4,1),left .45s cubic-bezier(.3,1,.4,1);animation:in .5s cubic-bezier(.2,.8,.2,1)}
+.tip h3{margin:0 0 6px;font-size:19px}.tip p{margin:0 0 16px;color:var(--mute);line-height:1.5;font-size:15px}
+.tip .btn{padding:9px 14px;font-size:14px}.tip .btn.main{padding:9px 20px;font-size:15px}
+.tdots{display:flex;gap:6px;margin-bottom:12px}.tdots i{width:7px;height:7px;border-radius:4px;background:var(--panel2);transition:width .3s,background .3s}.tdots i.on{background:var(--acc);width:22px}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+/* section tints */
+body{background:color-mix(in srgb,var(--tint,#888) 18%,var(--bg));transition:background-color .9s ease,color .4s}
+body[data-sec=met]{--tint:#f59e0b}body[data-sec=tun]{--tint:#06b6d4}body[data-sec=dro]{--tint:#8b5cf6}body[data-sec=tim]{--tint:#f43f5e}body[data-sec=ram]{--tint:#22c55e}body[data-sec=log]{--tint:#3b82f6}body[data-sec=sto]{--tint:#f97316}
+/* stories grid */
+.cards{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{flex-direction:column;align-items:flex-start;gap:10px;padding:16px;min-height:170px}
+.card:hover{transform:translateY(-4px)}
+.card>div:last-child{width:100%}
+.badge{width:58px;height:58px;font-size:18px}
+.card span{display:block;font-size:13px}
+.card em{font-style:normal;font-size:12px;font-weight:600;margin-top:10px;padding:3px 10px;border-radius:99px;background:var(--panel);display:inline-block}
+body[data-sec=pit]{--tint:#ec4899}
+.doodle{align-self:stretch;background:#fffdf7;border-radius:12px;border:2px dashed #cfcfcf;overflow:hidden}
+.doodle svg{display:block;width:100%;height:130px}
+.doodle.big{max-width:260px;margin:18px 0 0}.doodle.big svg{height:220px}
+.doodle{align-self:flex-start;width:70px;height:70px;background:none;border:0;border-radius:0;overflow:visible}
+.doodle svg{width:70px;height:70px}
+.doodle.big{width:112px;height:112px;max-width:none;margin:16px 0 0}.doodle.big svg{width:112px;height:112px}
+.card{min-height:0;gap:8px}
+.foot{position:relative;max-width:760px;margin:0 auto;padding:0 18px calc(40px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--mute);font-size:13px;line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="logo"><svg viewBox="0 0 48 48" fill="none" stroke="#10213a" stroke-linecap="round" aria-hidden="true"><path d="M35 13.5A15 15 0 1 0 35 34.5" stroke-width="5"/><g class="eq" stroke-width="4"><line x1="21" y1="19" x2="21" y2="29"/><line x1="27" y1="14" x2="27" y2="34"/><line x1="33" y1="20" x2="33" y2="28"/></g></svg></div>
+ <div><h1>CoreKit For Musicians</h1><p>Your practice toolkit</p></div>
+ <div class="grow"></div>
+ <button class="icon-btn" id="tourbtn" aria-label="Take the tour"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 1.7-2.5 2-2.5 3.5M12 17h.01"/></svg></button>
+ <button class="icon-btn" id="snd" aria-label="Sound effects on or off"><svg class="i" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><line class="sl" x1="3" y1="3" x2="21" y2="21"/></svg></button>
+ <button class="icon-btn" id="theme" aria-label="Switch light or dark theme"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+</header>
+<div class="staff" aria-hidden="true"><i style="left:8%;top:14px">♪</i><i style="left:26%;top:2px">♫</i><i style="left:47%;top:20px">♩</i><i style="left:66%;top:6px">♪</i><i style="left:86%;top:16px">♫</i></div>
+
+<nav class="tabs" role="tablist" aria-label="Tools">
+ <div class="pill" id="pill"></div>
+ <button class="tab" role="tab" aria-selected="true" data-p="met"><svg class="i" viewBox="0 0 24 24"><path d="M8 21 10 4h4l2 17z"/><path d="M12 17 16 8"/><path d="M6 21h12"/></svg><span>Metronome</span></button>
+ <button class="tab" role="tab" aria-selected="false" data-p="tun"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg><span>Tuner</span></button>
+ <button class="tab" role="tab" aria-selected="false" data-p="dro"><svg class="i" viewBox="0 0 24 24"><path d="M2 12c2-6 4-6 5 0s3 6 5 0 3-6 5 0 3 6 5 0"/></svg><span>Drone</span></button>
+ <button class="tab" role="tab" aria-selected="false" data-p="pit"><svg class="i" viewBox="0 0 24 24"><path d="M3 12h3l3-8 4 16 3-8h5"/></svg><span>Pitch</span></button>
+ <button class="tab" role="tab" aria-selected="false" data-p="tim"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg><span>Timer</span></button>
+ <button class="tab" role="tab" aria-selected="false" data-p="ram"><svg class="i" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg><span>Ramp</span></button>
+ <button class="tab" role="tab" aria-selected="false" data-p="log"><svg class="i" viewBox="0 0 24 24"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4zM8 9h8M8 13h6"/></svg><span>Log</span></button>
+ <button class="tab" role="tab" aria-selected="false" data-p="sto"><svg class="i" viewBox="0 0 24 24"><path d="M2 5c4-1 7 0 10 2 3-2 6-3 10-2v14c-4-1-7 0-10 2-3-2-6-3-10-2zM12 7v14"/></svg><span>Stories</span></button>
+</nav>
+
+<section class="panel on" id="met">
+ <h2>Metronome</h2><p class="sub">Keep steady time, from 30 to 240 beats per minute.</p>
+ <div class="stage"><svg width="200" height="210" viewBox="0 0 200 210" aria-hidden="true">
+  <path d="M60 200 80 30h40l20 170z" fill="var(--panel2)" stroke="var(--line)" stroke-width="3" stroke-linejoin="round"/>
+  <g id="arm"><line x1="100" y1="190" x2="100" y2="40" stroke="var(--acc)" stroke-width="5" stroke-linecap="round"/><rect id="wt" x="88" y="100" width="24" height="22" rx="5" fill="var(--acc2)"/></g>
+  <circle cx="100" cy="190" r="8" fill="var(--ink)"/></svg></div>
+ <div class="readout row" style="gap:6px"><span class="big" id="bpm">100</span><span class="unit">BPM</span></div>
+ <div class="beats" id="beats"></div>
+ <input type="range" id="bpmR" min="30" max="240" value="100" aria-label="Tempo">
+ <div class="row">
+  <button class="round" id="m-" aria-label="Slower">−</button>
+  <button class="btn main" id="mgo">Start</button>
+  <button class="round" id="m+" aria-label="Faster">+</button>
+ </div>
+ <div class="row" style="margin-top:16px"><button class="btn" id="tap">Tap tempo</button>
+  <label class="unit">Beats <select id="sig"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option></select></label></div>
+</section>
+
+<section class="panel" id="tun">
+ <h2>Tuner</h2><p class="sub">Pick your instrument, then play one string at a time. Needs microphone access.</p>
+ <div class="chips" id="insr" style="margin:0 0 6px"></div>
+ <div class="row" id="tunr" style="margin:0 0 4px"></div>
+ <div class="stage"><svg width="300" height="170" viewBox="0 0 300 170" aria-hidden="true">
+  <path d="M30 150A120 120 0 0 1 270 150" fill="none" stroke="var(--panel2)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M138 31.5A120 120 0 0 1 162 31.5" fill="none" stroke="var(--acc2)" stroke-width="16"/>
+  <g id="needle"><line x1="150" y1="150" x2="150" y2="45" stroke="var(--acc)" stroke-width="5" stroke-linecap="round"/></g>
+  <circle cx="150" cy="150" r="10" fill="var(--ink)"/></svg></div>
+ <div class="readout"><div class="note" id="nn">–</div><div class="small" id="nf">Press start and play a note</div><div class="small" id="nh"></div></div>
+ <div class="chips" id="strr" style="margin:14px 0 4px"></div><div class="small" style="text-align:center">Tap a string to hear it and lock onto it. Tap again for automatic detection.</div>
+ <div class="row" style="margin-top:16px"><label class="unit">A4 <select id="ref"><option>415</option><option>432</option><option selected>440</option><option>442</option></select> Hz</label><button class="btn main" id="tgo">Start tuner</button></div>
+</section>
+
+<section class="panel" id="dro">
+ <h2>Drone</h2><p class="sub">A steady pitch to tune your ear and practise intonation against.</p>
+ <div class="wheel" id="wheel"></div>
+ <div class="row"><label class="unit">Octave <select id="oct"><option>2</option><option selected>3</option><option>4</option></select></label>
+ <label class="unit">Sound <select id="dmode"><option value="1">Root</option><option value="2">Root + fifth</option></select></label></div>
+ <div class="lab" style="margin-top:14px"><span>Volume</span><span id="vv">50%</span></div>
+ <input type="range" id="vol" min="0" max="100" value="50" aria-label="Volume">
+ <div class="row"><button class="btn main" id="dgo">Play drone</button></div>
+</section>
+
+<section class="panel" id="ram">
+ <h2>Tempo ramp</h2><p class="sub">Start slow and speed up a little every few bars until you reach your target.</p>
+ <div class="row" style="gap:6px"><span class="big" id="rb">60</span><span class="unit">BPM</span></div>
+ <div class="bar"><i id="rbar"></i></div><div class="small" id="rinfo" style="text-align:center">Ready</div>
+ <div class="f4"><label>Start BPM<input class="num" type="number" id="r1" value="60" min="30" max="240"></label><label>Target BPM<input class="num" type="number" id="r2" value="100" min="30" max="240"></label><label>Step (BPM)<input class="num" type="number" id="r3" value="5" min="1" max="30"></label><label>Bars per step<input class="num" type="number" id="r4" value="4" min="1" max="32"></label></div>
+ <div class="row"><button class="btn main" id="rgo">Start ramp</button></div>
+</section>
+
+<section class="panel" id="log">
+ <h2>Practice log</h2><p class="sub">Timer and ramp sessions are added for you. Add anything else below.</p>
+ <div class="week" id="week"></div>
+ <div class="stats" style="margin:8px 0 18px"><div><b id="lwk">0</b>minutes, last 7 days</div><div><b id="lall">0</b>minutes logged</div></div>
+ <div class="row"><input class="num" type="number" id="lm" value="20" min="1" max="600" aria-label="Minutes"><select id="lt"><option>Metronome</option><option>Tuner</option><option>Drone</option><option>Timer</option><option>Ramp</option><option>Other</option></select><input class="txt" id="ln" maxlength="60" placeholder="What did you work on?"><button class="btn" id="ladd">Add</button></div>
+ <ul id="llist"></ul>
+</section>
+
+<section class="panel" id="sto">
+ <div id="slist"><h2>Stories</h2><p class="sub">Real moments from the lives of musicians, from the classics to today, each with a practice lesson.</p><div class="cards" id="cards"></div></div>
+ <div class="read" id="sread" hidden></div>
+</section>
+
+<section class="panel" id="pit">
+ <h2>Pitch detector</h2><p class="sub">Sing or play and watch your notes drawn live. It also tracks your range. Needs microphone access.</p>
+ <div class="readout"><div class="note" id="pn">–</div><div class="small" id="pf">Sing or play a note</div></div>
+ <canvas id="pcv" style="width:100%;height:220px;display:block;margin:14px 0;border-radius:16px;background:var(--panel2)"></canvas>
+ <div class="stats" style="margin-top:0"><div><b id="prange">–</b>your range</div></div>
+ <div class="row" style="margin-top:14px"><button class="btn" id="preset">Reset range</button><button class="btn main" id="pgo">Start listening</button></div>
+</section>
+
+<section class="panel" id="tim">
+ <h2>Practice timer</h2><p class="sub">Set a block, play, and log your time.</p>
+ <div class="ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" stroke="var(--panel2)"/><circle id="prog" cx="100" cy="100" r="90" stroke-dasharray="565.5" stroke-dashoffset="0"/></svg><div class="t" id="tt">25:00</div></div>
+ <div class="chips" id="chips"></div>
+ <div class="row"><button class="round" id="t-" aria-label="One minute less">−</button><button class="btn main" id="tgo2">Start</button><button class="round" id="t+" aria-label="One minute more">+</button></div>
+ <div class="row" style="margin-top:12px"><button class="btn" id="treset">Reset and log</button></div>
+ <div class="stats"><div><b id="sMin">0</b>minutes today</div><div><b id="sNum">0</b>sessions today</div></div>
+</section>
+</div>
+<footer class="foot"><p>CoreKit For Musicians is free to use. Microphone audio is analysed on your device only and is never recorded or sent anywhere. Your practice log stays in your own browser.</p><p>Stories are written in original words for education, and the illustrations are original, not official images of any artist.</p></footer>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="wob"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4"/></filter></svg>
+<div class="tour" id="tour" hidden><div class="spot" id="spot"></div><div class="tip" id="tip" role="dialog" aria-label="Guided tour"><div class="tdots" id="tdots"></div><h3 id="th"></h3><p id="tp"></p><div class="trow"><button class="btn" id="tskip">Skip tour</button><span><button class="btn" id="tback">Back</button> <button class="btn main" id="tnext">Next</button></span></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let ac;function ctx(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();return ac}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.id);toast.id=setTimeout(()=>t.classList.remove('show'),2600)}
+
+/* theme */
+$('#theme').onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark'};
+
+/* tabs */
+const tabs=$$('.tab'),pill=$('#pill');
+function movePill(){const t=$('.tab[aria-selected=true]');pill.style.width=t.offsetWidth+'px';pill.style.transform=`translateX(${t.offsetLeft}px)`}
+tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.setAttribute('aria-selected',x===t));$$('.panel').forEach(p=>p.classList.toggle('on',p.id===t.dataset.p));movePill()});
+addEventListener('resize',movePill);document.fonts&&document.fonts.ready.then(movePill);movePill();
+
+/* metronome */
+const M={bpm:100,n:4,run:false,next:0,beat:0,id:0,side:1};
+function setBpm(v){M.bpm=Math.max(30,Math.min(240,v|0));$('#bpm').textContent=M.bpm;$('#bpmR').value=M.bpm}
+function drawBeats(){$('#beats').innerHTML=Array.from({length:M.n},(_, i)=>`<div class="dot${i?'':' first'}"></div>`).join('')}
+function click(t,acc){const a=ctx(),o=a.createOscillator(),g=a.createGain();o.frequency.value=acc?1600:1050;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.7,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+.07);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.09)}
+function flash(b){const ds=$$('#beats .dot');ds.forEach(d=>d.classList.remove('hit'));if(ds[b])ds[b].classList.add('hit');const arm=$('#arm');arm.style.transitionDuration=(60/M.bpm)+'s';M.side*=-1;arm.style.transform=`rotate(${M.side*26}deg)`;}
+function sched(){const a=ctx();while(M.next<a.currentTime+.15){const b=M.beat;click(M.next,b===0);setTimeout(()=>M.run&&flash(b),Math.max(0,(M.next-a.currentTime)*1000));M.next+=60/M.bpm;M.beat=(M.beat+1)%M.n}}
+function mStart(){const a=ctx();M.run=true;M.beat=0;M.next=a.currentTime+.06;sched();M.id=setInterval(sched,25);$('#mgo').textContent='Stop'}
+function mStop(){M.run=false;clearInterval(M.id);$('#mgo').textContent='Start';$$('#beats .dot').forEach(d=>d.classList.remove('hit'));$('#arm').style.transform='rotate(0deg)'}
+$('#mgo').onclick=()=>M.run?mStop():mStart();
+$('#bpmR').oninput=e=>setBpm(+e.target.value);
+document.getElementById('m-').onclick=()=>setBpm(M.bpm-1);document.getElementById('m+').onclick=()=>setBpm(M.bpm+1);
+$('#sig').onchange=e=>{M.n=+e.target.value;M.beat=0;drawBeats()};
+let taps=[];$('#tap').onclick=()=>{const n=performance.now();if(taps.length&&n-taps[taps.length-1]>2000)taps=[];taps.push(n);taps=taps.slice(-6);if(taps.length>1){const iv=(taps[taps.length-1]-taps[0])/(taps.length-1);setBpm(60000/iv)}};
+addEventListener('keydown',e=>{if(e.code==='Space'&&$('#met').classList.contains('on')&&!/SELECT|INPUT|BUTTON/.test(e.target.tagName)){e.preventDefault();$('#mgo').click()}});
+drawBeats();
+
+/* tuner */
+const NN=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+let T={on:false};
+function detect(buf,sr){let r=0;for(const v of buf)r+=v*v;if(Math.sqrt(r/buf.length)<.012)return -1;
+ const maxL=Math.floor(sr/60),minL=Math.floor(sr/1000),n=buf.length-maxL,c=new Float32Array(maxL+2);let mx=0;
+ for(let l=minL;l<=maxL;l++){let s=0;for(let i=0;i<n;i+=2)s+=buf[i]*buf[i+l];c[l]=s;if(s>mx)mx=s}
+ if(mx<=0)return -1;let best=-1;
+ for(let l=minL+1;l<maxL;l++)if(c[l]>.85*mx&&c[l]>=c[l-1]&&c[l]>=c[l+1]){best=l;break}
+ if(best<0)return -1;const a=c[best-1],b=c[best],d=c[best+1],den=a-2*b+d,sh=den?(a-d)/(2*den):0;return sr/(best+sh)}
+async function tStart(){try{const a=ctx();T.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+ const src=a.createMediaStreamSource(T.stream);T.an=a.createAnalyser();T.an.fftSize=4096;src.connect(T.an);T.buf=new Float32Array(T.an.fftSize);T.on=true;T.last=0;$('#tgo').textContent='Stop tuner';tLoop()}
+ catch(e){toast('Microphone unavailable. Allow access in your browser and try again.')}}
+function tStop(){T.on=false;T.stream&&T.stream.getTracks().forEach(t=>t.stop());$('#tgo').textContent='Start tuner';$('#nn').textContent='–';$('#nn').classList.remove('ok');$('#nf').textContent='Press start and play a note';$('#needle').style.transform='rotate(0deg)'}
+function tLoop(){if(!T.on)return;requestAnimationFrame(tLoop);const now=performance.now();if(now-T.last<40)return;T.last=now;
+ T.an.getFloatTimeDomainData(T.buf);const f=detect(T.buf,ac.sampleRate);if(f<0)return;
+ const m=69+12*Math.log2(f/440),r=Math.round(m),cents=Math.round((m-r)*100);
+ $('#nn').textContent=NN[((r%12)+12)%12]+Math.floor(r/12-1);$('#nn').classList.toggle('ok',Math.abs(cents)<=5);
+ $('#nf').textContent=`${f.toFixed(1)} Hz · ${cents>0?'+':''}${cents} cents ${Math.abs(cents)<=5?'· in tune':cents>0?'· too high':'· too low'}`;
+ $('#needle').style.transform=`rotate(${cents*0.9}deg)`}
+$('#tgo').onclick=()=>T.on?tStop():tStart();
+
+/* drone */
+const D={note:9,on:false,oscs:[]};
+$('#wheel').innerHTML=NN.map((n,i)=>`<button class="key${i===9?' on':''}" data-n="${i}">${n}</button>`).join('');
+const freq=()=>440*Math.pow(2,((12*(+$('#oct').value+1)+D.note)-69)/12);
+function dStart(){const a=ctx();D.g=a.createGain();D.g.gain.value=0;D.g.connect(a.destination);D.oscs=[];
+ const mk=(type,mult,lv)=>{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=freq()*mult;g.gain.value=lv;o.connect(g).connect(D.g);o.start();D.oscs.push({o,mult})};
+ mk('sine',1,.6);mk('triangle',1,.25);mk('sine',2,.15);if($('#dmode').value==='2')mk('sine',1.5,.35);
+ D.g.gain.setTargetAtTime($('#vol').value/200,a.currentTime,.25);D.on=true;$('#dgo').textContent='Stop drone'}
+function dStop(){const a=ac;D.g.gain.setTargetAtTime(0,a.currentTime,.15);const os=D.oscs;setTimeout(()=>os.forEach(x=>x.o.stop()),700);D.on=false;$('#dgo').textContent='Play drone'}
+function dRetune(){if(D.on)D.oscs.forEach(x=>x.o.frequency.setTargetAtTime(freq()*x.mult,ac.currentTime,.05))}
+$('#wheel').onclick=e=>{const b=e.target.closest('.key');if(!b)return;$$('.key').forEach(k=>k.classList.toggle('on',k===b));D.note=+b.dataset.n;if(D.on)dRetune();else dStart()};
+$('#dgo').onclick=()=>D.on?dStop():dStart();
+$('#oct').onchange=dRetune;
+$('#dmode').onchange=()=>{if(D.on){dStop();setTimeout(dStart,120)}};
+$('#vol').oninput=e=>{$('#vv').textContent=e.target.value+'%';if(D.on)D.g.gain.setTargetAtTime(e.target.value/200,ac.currentTime,.05)};
+
+/* timer */
+const C=2*Math.PI*90;let TM={total:1500,left:1500,run:false,end:0,done:0,id:0};
+$('#chips').innerHTML=[10,15,25,45].map(m=>`<button class="chip${m===25?' on':''}" data-m="${m}">${m} min</button>`).join('');
+const key='woodshed-'+new Date().toDateString();
+function load(){try{return JSON.parse(localStorage.getItem(key))||{s:0,n:0}}catch(e){return{s:0,n:0}}}
+function save(o){try{localStorage.setItem(key,JSON.stringify(o))}catch(e){}}
+let log=load();
+function stats(){$('#sMin').textContent=Math.round(log.s/60);$('#sNum').textContent=log.n}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.ceil(s%60)%60).padStart(2,'0')}
+function draw(){const l=Math.ceil(TM.left);$('#tt').textContent=String(Math.floor(l/60)).padStart(2,'0')+':'+String(l%60).padStart(2,'0');$('#prog').style.strokeDashoffset=C*(1-TM.left/TM.total)}
+function setTotal(m){m=Math.max(1,Math.min(180,m));TM.total=TM.left=m*60;TM.done=0;$$('.chip').forEach(c=>c.classList.toggle('on',+c.dataset.m===m));draw()}
+function logIt(){if(TM.done>=30){log.s+=TM.done;log.n++;save(log);stats();addLog(Math.max(1,Math.round(TM.done/60)),'Timer','')}TM.done=0}
+function chime(){const a=ctx();[660,880,1320].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+i*.22;o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.4,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.5);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.55)})}
+function tick(){const l=(TM.end-Date.now())/1000;if(l<=0){TM.left=0;draw();pause();TM.done=TM.total;chime();toast('Session complete. Nice work!');logIt();TM.left=TM.total;draw();return}TM.left=l;TM.done=TM.total-l;draw()}
+function pause(){TM.run=false;clearInterval(TM.id);$('#tgo2').textContent='Start'}
+$('#tgo2').onclick=()=>{if(TM.run){pause();return}ctx();TM.end=Date.now()+TM.left*1000;TM.run=true;TM.id=setInterval(tick,200);$('#tgo2').textContent='Pause'};
+$('#treset').onclick=()=>{pause();logIt();TM.left=TM.total;draw()};
+$('#chips').onclick=e=>{const c=e.target.closest('.chip');if(c){pause();setTotal(+c.dataset.m)}};
+document.getElementById('t-').onclick=()=>{pause();setTotal(Math.round(TM.total/60)-1)};document.getElementById('t+').onclick=()=>{pause();setTotal(Math.round(TM.total/60)+1)};
+stats();draw();
+
+/* nav scroll */
+tabs.forEach(t=>t.addEventListener('click',()=>{t.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'})}));
+
+/* sound effects */
+let SND=true;$('#snd').onclick=()=>{SND=!SND;$('#snd').classList.toggle('off',!SND);if(SND)sfx('tap')};
+function sfx(k,f){if(!SND)return;const a=ctx(),t=a.currentTime,o=a.createOscillator(),g=a.createGain();
+ const p={tap:[520,.12,.05,'sine'],tab:[700,.1,.1,'triangle'],ok:[988,.14,.25,'sine'],pluck:[f,.2,.6,'triangle']}[k];
+ o.type=p[3];o.frequency.setValueAtTime(p[0],t);if(k==='tab')o.frequency.exponentialRampToValueAtTime(1100,t+.1);
+ g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(p[1],t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+p[2]);o.connect(g).connect(a.destination);o.start(t);o.stop(t+p[2]+.05)}
+document.addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b||b.id==='snd'||b.id==='mgo')return;const key=b.classList.contains('key');sfx(b.classList.contains('tab')?'tab':key?'pluck':'tap',key?880*Math.pow(2,(+b.dataset.n-9)/12):0)});
+
+/* ramp trainer */
+const R={run:false,id:0};
+function rStart(){const a=ctx();R.s=Math.max(30,+$('#r1').value||60);R.t=Math.max(R.s,Math.min(240,+$('#r2').value||100));R.st=Math.max(1,+$('#r3').value||5);R.nb=Math.max(1,+$('#r4').value||4);R.bpm=R.s;R.beat=0;R.bar=0;R.t0=Date.now();R.next=a.currentTime+.06;R.run=true;rsched();R.id=setInterval(rsched,25);$('#rgo').textContent='Stop ramp'}
+function rsched(){const a=ctx();while(R.run&&R.next<a.currentTime+.15){const b=R.beat,bp=R.bpm;click(R.next,b===0);setTimeout(()=>R.run&&rShow(bp,b),Math.max(0,(R.next-a.currentTime)*1000));R.next+=60/R.bpm;R.beat=(R.beat+1)%4;if(R.beat===0){R.bar++;if(R.bar%R.nb===0){if(R.bpm<R.t)R.bpm=Math.min(R.t,R.bpm+R.st);else{setTimeout(()=>rStop(true),Math.max(0,(R.next-a.currentTime)*1000));R.run=false;clearInterval(R.id)}}}}}
+function rShow(bp,b){$('#rb').textContent=bp;$('#rbar').style.width=((bp-R.s)/Math.max(1,R.t-R.s)*100)+'%';$('#rinfo').textContent=`Beat ${b+1}. +${R.st} BPM every ${R.nb} bars`}
+function rStop(done){R.run=false;clearInterval(R.id);$('#rgo').textContent='Start ramp';const ms=Date.now()-R.t0;if(done){chime();toast('Target reached: '+R.t+' BPM');$('#rinfo').textContent='Target reached';}else $('#rinfo').textContent='Stopped';if(ms>=30000)addLog(Math.max(1,Math.round(ms/60000)),'Ramp',`${R.s} to ${R.bpm} BPM`)}
+$('#rgo').onclick=()=>R.run?rStop(false):rStart();
+
+/* practice log */
+const ld=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let PL=[];try{PL=JSON.parse(localStorage.getItem('woodshed-log'))||[]}catch(e){}
+function addLog(m,t,n){PL.unshift({d:ld(new Date()),m,t,n:n||''});PL=PL.slice(0,200);try{localStorage.setItem('woodshed-log',JSON.stringify(PL))}catch(e){}renderLog()}
+function renderLog(){const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d}),sums=days.map(d=>PL.filter(x=>x.d===ld(d)).reduce((s,x)=>s+x.m,0)),mx=Math.max(30,...sums);
+ $('#week').innerHTML=days.map((d,i)=>`<div><b>${sums[i]||''}</b><i style="height:${Math.max(4,sums[i]/mx*70)}%"></i><span>${d.toLocaleDateString('en-GB',{weekday:'narrow'})}</span></div>`).join('');
+ $('#lwk').textContent=sums.reduce((a,b)=>a+b,0);$('#lall').textContent=PL.reduce((s,x)=>s+x.m,0);
+ $('#llist').innerHTML=PL.slice(0,8).map(x=>`<li><b>${x.m} min</b> ${x.t}${x.n?' – '+esc(x.n):''}<em>${x.d}</em></li>`).join('')||'<li class="small">No sessions yet. Finish a timer or add one above.</li>'}
+$('#ladd').onclick=()=>{addLog(Math.max(1,Math.min(600,+$('#lm').value|0)),$('#lt').value,$('#ln').value.slice(0,60));$('#ln').value='';sfx('ok');toast('Session logged')};
+renderLog();
+
+/* stories */
+const ST=[
+{n:'Johann Sebastian Bach',y:'1685–1750',r:'Organist and composer',i:'JB',t:'In 1705, a twenty-year-old Bach set out on a journey of roughly 400 kilometres, much of it reportedly on foot, to hear the organist Dieterich Buxtehude play in Lübeck. He had permission for a few weeks and stayed for months, absorbing how Buxtehude shaped long, daring organ pieces. His employers were not pleased, but the trip changed the way Bach wrote for the organ.',k:'Seek out great players and listen closely. One strong influence can reshape your whole approach.'},
+{n:'Wolfgang Amadeus Mozart',y:'1756–1791',r:'Composer and pianist',i:'WM',t:'Mozart was performing for European courts as a child. In 1770, aged fourteen, he heard Allegri\'s Miserere, a closely guarded choral work, in the Sistine Chapel in Rome. The well-known story says he wrote the whole piece out from memory afterwards and fixed a few details at a second hearing. Whatever the exact details, it shows an extraordinary ear.',k:'Train your ear. Singing or playing back what you hear is one of the oldest practice tools there is.'},
+{n:'Ludwig van Beethoven',y:'1770–1827',r:'Composer and pianist',i:'LB',t:'Beethoven began losing his hearing in his late twenties, and in 1802 he wrote a private letter, now called the Heiligenstadt Testament, about his despair. He chose to keep composing. When his Ninth Symphony premiered in 1824 he was almost completely deaf, and accounts say a singer turned him around so he could see the audience\'s applause.',k:'Setbacks change how you work, not whether you can. Find the method that suits your situation.'},
+{n:'Clara Schumann',y:'1819–1896',r:'Concert pianist and composer',i:'CS',t:'A child prodigy, Clara Wieck gave her first public concerts as a girl and went on to perform across Europe for more than sixty years. She was among the first leading pianists to play whole recitals from memory. After her husband Robert died in 1856, she supported her family through concerts and teaching.',k:'Steady, daily work builds a long career. Memorising a piece also deepens how well you know it.'},
+{n:'Louis Armstrong',y:'1901–1971',r:'Trumpeter and singer',i:'LA',t:'Born in New Orleans, Louis Armstrong learned the cornet as a boy at a home for troubled youth. He later joined King Oliver\'s band in Chicago and, with his Hot Five and Hot Seven recordings in the 1920s, helped turn jazz into a soloist\'s art. His playing and singing shaped melodies as if he were speaking.',k:'Play phrases like sentences. Give each one a start, a peak and a place to breathe.'},
+{n:'Ella Fitzgerald',y:'1917–1996',r:'Jazz singer',i:'EF',t:'In 1934, a teenage Ella Fitzgerald entered an amateur night at Harlem\'s Apollo Theater planning to dance. Facing a strong act just before her, she froze and sang instead, and she won. She became known as the First Lady of Song, famed for her clear tone and fearless scat singing.',k:'Nerves happen. A well-prepared skill can carry you when your plans change.'}];
+ST.push(
+{n:'The Beatles',y:'1960–1970',r:'Rock band',i:'TB',t:'Before they were famous, the Beatles spent long stretches in Hamburg between 1960 and 1962, playing sets that ran for hours, night after night, in the city\'s clubs. That marathon of live playing made them a tight, tireless band. In 1966 they stopped touring and focused on the studio, which led to albums like Sgt. Pepper\'s Lonely Hearts Club Band in 1967.',k:'Play with other people as often as you can. Hours of live repetition build a band that locks together.'},
+{n:'Jimi Hendrix',y:'1942–1970',r:'Rock guitarist',i:'JH',t:'Jimi Hendrix was left-handed and played a right-handed guitar flipped upside down, restrung to suit him. He worked for years as a backing guitarist in the United States before moving to London in 1966. Within months his flaming, inventive style made him a star, and his debut album Are You Experienced came out in 1967.',k:'Adapt the instrument to your body, not the other way round. An unusual setup can become your signature sound.'},
+{n:'Queen',y:'1970–1991',r:'Rock band',i:'Q',t:'Queen formed in London in 1970. At Live Aid in 1985 they played a set of about twenty minutes at Wembley Stadium that is often ranked among the best live performances in rock. Singer Freddie Mercury had the huge crowd clapping and singing back to him, line by line.',k:'Connect with your audience. A simple clap or sing-along can turn a performance into a shared moment.'},
+{n:'Led Zeppelin',y:'1968–1980',r:'Rock band',i:'LZ',t:'Led Zeppelin formed in 1968 around guitarist Jimmy Page. Their debut album was reportedly recorded in around 36 hours of studio time, which was possible because the band had already rehearsed and toured the songs. The record helped set the sound of hard rock.',k:'Rehearse until the music is second nature. Then recording, or performing, goes fast.'});
+ST.forEach((s,i)=>s.g=s.g||(i<4?'Classical':i<6?'Jazz':'Rock'));
+ST.push(
+{n:'Chuck Berry',y:'1926-2017',r:'Rock guitarist',g:'Rock',i:'CB',t:'Chuck Berry blended country and blues guitar into a driving rhythm and wrote sharp lyrics about teenage life, with hits like Maybellene in 1955 and Johnny B. Goode in 1958. His guitar riffs and his duck walk across the stage influenced generations of rock players, including the Beatles and the Rolling Stones.',k:'Borrow from different styles and combine them. A simple riff played with attitude goes a long way.'},
+{n:'Pink Floyd',y:'1965-1995',r:'Rock band',g:'Rock',i:'PF',t:'Pink Floyd released The Dark Side of the Moon in 1973 after months in the studio, building its sound with tape loops, synthesisers and recorded sound effects such as clocks and cash registers. The album stayed on the charts for years and showed how far a rock band could push studio recording.',k:'Treat the studio as an instrument. Everyday sounds can become part of the music.'},
+{n:'Fleetwood Mac',y:'1967 onward',r:'Rock band',g:'Rock',i:'FM',t:'Fleetwood Mac made Rumours in 1976 and 1977 while relationships inside the band were breaking down. They turned that tension into songs, and the album became one of the best-selling records of all time.',k:'Put real feeling into your writing. Honest songs connect with listeners.'},
+{n:'B.B. King',y:'1925-2015',r:'Blues guitarist',g:'Blues',i:'BB',t:'In 1949, B.B. King was playing a dance hall in Arkansas when a fight broke out and a fire started. He ran out, then went back in to rescue his guitar. He later learned the fight was over a woman named Lucille, and he named every guitar Lucille from then on.',k:'Treat your instrument as a partner. A few well-placed notes can be a voice people recognise.'},
+{n:'Muddy Waters',y:'1913-1983',r:'Blues guitarist and singer',g:'Blues',i:'MW',t:'Muddy Waters grew up in Mississippi and moved to Chicago in 1943. There he switched to an electric guitar so he could be heard over the noise of city clubs. The loud, electric Chicago blues he helped create became a foundation for rock and roll.',k:'Adapt your sound to the room you are playing in.'},
+{n:'Aretha Franklin',y:'1942-2018',r:'Soul singer',g:'Soul',i:'AF',t:'Aretha Franklin began singing gospel in her father\'s church in Detroit as a child. In 1967, after signing with Atlantic Records, she recorded Respect, a song written by Otis Redding, and her version became a hit and an anthem. She became known as the Queen of Soul.',k:'Make a song your own. Your phrasing and feel are what listeners remember.'},
+{n:'Johnny Cash',y:'1932-2003',r:'Country singer',g:'Folk & Country',i:'JC',t:'In January 1968, Johnny Cash played two concerts for the inmates of Folsom State Prison in California and recorded them live. The album At Folsom Prison became a major hit and revived his career.',k:'Play honestly for the people in front of you.'},
+{n:'Bob Dylan',y:'Active from the 1960s',r:'Folk and rock songwriter',g:'Folk & Country',i:'BD',t:'At the Newport Folk Festival in 1965, Bob Dylan played with an electric band for the first time in front of a folk audience. The reaction was mixed, but the moment is remembered as a turning point where folk music and rock came together.',k:'Follow your artistic instincts, even when an audience expects something else.'},
+{n:'Bob Marley',y:'1945-1981',r:'Reggae singer and songwriter',g:'Reggae',i:'BM',t:'Bob Marley grew up in Jamaica and rose to fame with his band the Wailers. In the 1970s he brought reggae to a worldwide audience with albums such as Catch a Fire and Exodus, mixing relaxed, catchy rhythms with messages of unity.',k:'Space matters. Playing fewer notes can make a groove stronger.'});
+ST.push(
+{n:'Kendrick Lamar',y:'Active from the 2000s',r:'Rapper and songwriter',g:'Hip-hop',i:'KL',t:'Kendrick Lamar grew up in Compton, California, and began releasing mixtapes as a teenager. In 2018 he won the Pulitzer Prize for Music for his album DAMN., the first time the prize went to a work outside classical and jazz. He is known for dense rhymes and vivid storytelling.',k:'Tell specific, honest stories. Detail is what makes writing stand out.'},
+{n:'Jay-Z',y:'Active from the 1990s',r:'Rapper and entrepreneur',g:'Hip-hop',i:'JZ',t:'Jay-Z grew up in Brooklyn. The story goes that he struggled to land a record deal, so in the mid-1990s he co-founded his own label, Roc-A-Fella Records, and released his debut album Reasonable Doubt in 1996. He later built a business empire well beyond music.',k:'If doors do not open, build your own. Owning your work gives you control.'},
+{n:'Eminem',y:'Active from the 1990s',r:'Rapper',g:'Hip-hop',i:'EM',t:'Eminem grew up in Detroit and sharpened his skills in local rap battles. After Dr. Dre heard his demo tape and signed him, The Slim Shady LP broke through in 1999. His fast, intricate rhyming patterns became his signature.',k:'Practise under pressure. Freestyling against others builds quick thinking and sharp technique.'},
+{n:'Taylor Swift',y:'Active from the 2000s',r:'Pop and country songwriter',g:'Pop',i:'TS',t:'Taylor Swift began writing songs as a young girl, and her family moved to Nashville when she was fourteen so she could pursue music. After a dispute over who owned her early recordings, she began re-recording her albums in 2021 and releasing them as Taylor\'s Version.',k:'Know who owns your work. Writing your own songs gives you creative and business control.'},
+{n:'Beyoncé',y:'Active from the 1990s',r:'Pop and R&B singer',g:'Pop',i:'BY',t:'After rising to fame in the group Destiny\'s Child, Beyoncé went solo. In December 2013 she released a surprise self-titled album with a video for every song and no advance announcement, showing how a major artist could change the way music is released.',k:'Treat sound and visuals as one creative project, and do not be afraid to surprise your audience.'},
+{n:'Adele',y:'Active from the 2000s',r:'Pop and soul singer',g:'Pop',i:'AD',t:'Adele studied at the BRIT School in London. A friend reportedly posted her demo online, which led to a record deal. Her second album, 21, released in 2011 and featuring Rolling in the Deep, became a worldwide success built on her powerful voice and honest songwriting.',k:'Let the voice carry the song. Strong emotion and clear delivery beat complicated production.'},
+{n:'Ed Sheeran',y:'Active from the 2000s',r:'Singer-songwriter',g:'Pop',i:'ES',t:'Ed Sheeran spent his early years playing hundreds of small shows, often with just a guitar. He became known for using a loop pedal to build songs live, layering guitar, percussion and vocals by himself on stage.',k:'Practise with a loop pedal or recording app. Record a chord part, then play along with it.'},
+{n:'Billie Eilish',y:'Active from the 2010s',r:'Pop singer-songwriter',g:'Pop',i:'BE',t:'Billie Eilish and her brother Finneas wrote and recorded her first songs at home in Los Angeles. Her 2019 debut album was made largely in a bedroom studio, and it won the four top Grammy awards in 2020: Album, Record and Song of the Year, and Best New Artist.',k:'You do not need a big studio. Good ideas and careful listening matter more than gear.'});
+ST.push(
+{n:'Rihanna',y:'Active from the 2000s',r:'Pop and R&B singer',g:'Pop',i:'RH',t:'Rihanna grew up in Barbados and, as a teenager, travelled to New York to audition for the label Def Jam, then led by Jay-Z, which signed her. Her song Umbrella in 2007 brought her worldwide success, and she went on to build businesses beyond music.',k:'Prepare one great audition piece and be ready for when an opportunity arrives.'},
+{n:'Bruno Mars',y:'Active from the 2000s',r:'Pop singer and songwriter',g:'Pop',i:'BM',t:'Born in Honolulu, Hawaii, Bruno Mars performed as a child in a family band and as a young Elvis impersonator. He first found success writing and producing songs for other artists, before his own debut album Doo-Wops and Hooligans arrived in 2010.',k:'Early stage experience and songwriting skills open many doors. Learn both.'},
+{n:'Lady Gaga',y:'Active from the 2000s',r:'Pop singer and pianist',g:'Pop',i:'LG',t:'Lady Gaga began piano lessons around the age of four and later studied at New York University before leaving to focus on music. She played piano in New York clubs, and her 2008 debut album The Fame turned her into a pop star known for dramatic live shows.',k:'Solid technique on one instrument, like piano, supports every style you try later.'},
+{n:'Nicki Minaj',y:'Active from the 2000s',r:'Rapper',g:'Hip-hop',i:'NM',t:'Nicki Minaj grew up in Queens, New York, and attended the LaGuardia High School of Music and Art. She built a following with mixtapes before signing to Young Money in 2009, and her debut album Pink Friday followed in 2010. She is known for switching between characters and voices in her verses.',k:'Develop a voice that is clearly yours, and use changes in delivery to keep listeners hooked.'},
+{n:'Drake',y:'Active from the 2000s',r:'Rapper and singer',g:'Hip-hop',i:'DR',t:'Before music, Drake acted in the teen drama Degrassi. In 2009 he released the mixtape So Far Gone online for free, which attracted wide attention and led to a record deal. His blend of rapping and singing became hugely influential.',k:'Sharing your music freely can build an audience. Mix skills, such as rapping and singing, to stand out.'},
+{n:'Lizzo',y:'Active from the 2010s',r:'Singer, rapper and flautist',g:'Hip-hop',i:'LZ',t:'Lizzo trained as a classical flautist and studied flute performance at the University of Houston. She later played in bands in Minneapolis, and her song Truth Hurts became a major hit in 2019, two years after its release. She still plays the flute on stage.',k:'Keep your early skills alive. Classical training can become your signature in any genre.'});
+const PAL=['#e53935','#1e88e5','#8e24aa','#fb8c00','#00897b','#d81b60','#3949ab','#7cb342'];
+const DD={'Adele':'long #f9a825 mic','Aretha Franklin':'bun #3e2723 mic crown','B.B. King':'short #424242 guitar glasses','The Beatles':'bob #5d4037 drum','Beyoncé':'curly #f9a825 mic','Billie Eilish':'long #43a047 mic','Bob Dylan':'curly #6d4c41 guitar','Bob Marley':'long #212121 guitar','Bruno Mars':'short #212121 mic hat','Chuck Berry':'short #212121 guitar','Clara Schumann':'bun #6d4c41 piano','Drake':'short #212121 mic','Ed Sheeran':'short #e65100 guitar','Ella Fitzgerald':'bun #212121 mic','Eminem':'short #fdd835 mic','Fleetwood Mac':'long #8d6e63 guitar','Jay-Z':'short #212121 mic hat','Jimi Hendrix':'curly #212121 guitar','Johann Sebastian Bach':'wig #eeeeee piano','Johnny Cash':'short #212121 guitar hat','Kendrick Lamar':'short #212121 mic','Lady Gaga':'long #fdd835 piano','Led Zeppelin':'long #fdd835 guitar','Lizzo':'long #212121 flute','Louis Armstrong':'short #3e2723 trumpet','Ludwig van Beethoven':'curly #9e9e9e piano','Muddy Waters':'short #424242 guitar','Nicki Minaj':'long #ec407a mic','Pink Floyd':'curly #8d6e63 drum glasses','Queen':'short #212121 mic crown','Rihanna':'long #d32f2f mic','Taylor Swift':'long #fdd835 guitar','Wolfgang Amadeus Mozart':'wig #eeeeee violin'};
+function kid(s){const [hr,hc,pr,ex]=(DD[s.n]||'short #6d4c41 mic').split(' ');let k=0;for(const c of s.n)k=(k*31+c.charCodeAt(0))>>>0;
+ const sh=PAL[k%8],tilt=(k%7)-3,S='fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.4"';
+ const arms={guitar:'M50 62L64 76M50 62L72 70',mic:'M50 62L68 54M50 62L36 78',piano:'M50 62L36 86M50 62L64 86',trumpet:'M50 62L58 56M50 62L70 58',violin:'M50 62L40 58M50 62L76 62',flute:'M50 62L60 52M50 62L72 50',drum:'M50 62L34 90M50 62L66 90'}[pr];
+ const props={guitar:'<ellipse cx="62" cy="84" rx="11" ry="8" fill="#ffb300" stroke="#6d4c41" stroke-width="3"/><path d="M70 80L94 60" stroke="#6d4c41" stroke-width="4"/><circle cx="62" cy="84" r="3" fill="#6d4c41"/>',mic:'<circle cx="72" cy="51" r="5.5" fill="#bdbdbd" stroke="#333" stroke-width="2.5"/>',piano:'<rect x="20" y="86" width="60" height="14" fill="#fff" stroke="#222" stroke-width="2.5"/><path d="M32 86v8M44 86v8M56 86v8M68 86v8" stroke="#222" stroke-width="3"/>',trumpet:'<path d="M58 56h26" stroke="#f9a825" stroke-width="5"/><path d="M84 49l11 7-11 7z" fill="#fdd835" stroke="#f9a825" stroke-width="2"/>',violin:'<ellipse cx="38" cy="60" rx="7" ry="10" fill="#a1522b" stroke="#5d2f12" stroke-width="2.5" transform="rotate(-35 38 60)"/><path d="M78 62L92 44" stroke="#5d2f12" stroke-width="3"/>',flute:'<path d="M52 54L94 46" stroke="#90a4ae" stroke-width="5"/>',drum:'<ellipse cx="50" cy="98" rx="20" ry="6" fill="#ef5350" stroke="#7f0000" stroke-width="2.5"/><path d="M30 98v9q20 8 40 0v-9" fill="#e53935" stroke="#7f0000" stroke-width="2.5"/>'}[pr];
+ const wig=hr==='wig',back=hr==='curly'||wig?`<circle cx="50" cy="36" r="23" fill="${hc}" stroke="${wig?'#9e9e9e':'#333'}" stroke-width="2.5"/>`:'';
+ const arc=`<path d="M33 34q0-19 17-19t17 19" stroke="${hc}" stroke-width="6"/>`;
+ const front={short:arc,long:arc+`<path d="M33 34v28M67 34v28" stroke="${hc}" stroke-width="6"/>`,bob:`<path d="M32 40q-2-24 18-24t18 24M32 40v6M68 40v6" stroke="${hc}" stroke-width="7"/>`,bun:arc+`<circle cx="50" cy="11" r="6" fill="${hc}"/>`}[hr]||'';
+ const exs={crown:'<path d="M38 22l3-11 9 7 9-7 3 11z" fill="#fdd835" stroke="#f9a825" stroke-width="2.5"/>',hat:'<path d="M28 26h44M36 26q14-22 28 0" fill="#37474f" stroke="#111" stroke-width="3"/>',glasses:'<circle cx="43" cy="36" r="5" stroke="#222" stroke-width="2.4"/><circle cx="57" cy="36" r="5" stroke="#222" stroke-width="2.4"/><path d="M48 36h4" stroke="#222" stroke-width="2.4"/>'}[ex]||'';
+ return `<svg viewBox="0 0 100 120" aria-hidden="true"><g filter="url(#wob)" ${S} transform="rotate(${tilt} 50 60)"><circle cx="86" cy="15" r="7" stroke="#fbc02d"/><path d="M86 3v3M86 24v3M74 15h3M98 15h3" stroke="#fbc02d"/><path d="M4 113q22-5 46 0t46-1" stroke="#43a047"/><path d="M50 87L38 110M50 87L62 110" stroke="#37474f"/><path d="M50 54v33" stroke="${sh}" stroke-width="9"/><path d="${arms}" stroke="#37474f"/>${back}<circle cx="50" cy="38" r="17" fill="#ffe0b2" stroke="#6d4c41"/>${front}<circle cx="44" cy="35" r="2" fill="#222" stroke="none"/><circle cx="57" cy="35" r="2" fill="#222" stroke="none"/><path d="M43 44q7 7 14 0" stroke="#d32f2f"/>${exs}${props}</g></svg>`}
+let sq='',cg='All';const nk=s=>s.n.replace(/^The /,'').toLowerCase();ST.sort((a,b)=>nk(a).localeCompare(nk(b)));
+function drawCards(g){$('#cards').innerHTML=ST.map((s,i)=>((g!=='All'&&s.g!==g)||(sq&&!(s.n+' '+s.r+' '+s.g).toLowerCase().includes(sq)))?'':`<button class="card" data-i="${i}"><div class="doodle">${kid(s)}</div><div><b>${s.n}</b><span>${s.y}</span><span>${s.r}</span><em>${s.g}</em></div></button>`).join('')||'<p class="small">No stories match. Try a different name or genre.</p>'}
+const sf=document.createElement('div');sf.className='chips';sf.innerHTML=['All','Classical','Jazz','Rock','Blues','Soul','Folk & Country','Reggae','Hip-hop','Pop'].map(g=>`<button class="chip${g==='All'?' on':''}">${g}</button>`).join('');
+sf.onclick=e=>{const c=e.target.closest('.chip');if(!c)return;[...sf.children].forEach(x=>x.classList.toggle('on',x===c));cg=c.textContent;drawCards(cg)};
+$('#cards').before(sf);
+const si=document.createElement('input');si.className='txt';si.type='search';si.placeholder='Search artists and bands';si.setAttribute('aria-label','Search stories');si.style.cssText='width:100%;margin:0 0 12px';si.oninput=()=>{sq=si.value.trim().toLowerCase();drawCards(cg)};sf.before(si);drawCards('All');
+
+/* tuner v2 */
+const INS={Guitar:[['E2',40],['A2',45],['D3',50],['G3',55],['B3',59],['E4',64]],Bass:[['E1',28],['A1',33],['D2',38],['G2',43]],Ukulele:[['G4',67],['C4',60],['E4',64],['A4',69]],Violin:[['G3',55],['D4',62],['A4',69],['E5',76]],Cello:[['C2',36],['G2',43],['D3',50],['A3',57]],Chromatic:[]};
+let ins='Guitar',pin=-1,A4=440,hist=[],held=0;
+const mf=m=>A4*Math.pow(2,(m-69)/12);
+function drawIns(){$('#insr').innerHTML=Object.keys(INS).map(k=>`<button class="chip${k===ins?' on':''}" data-k="${k}">${k}</button>`).join('');$('#strr').innerHTML=INS[ins].map((s,i)=>`<button class="chip${i===pin?' on':''}" data-i="${i}">${s[0]}</button>`).join('')||'<span class="small">Detects any note</span>'}
+function tone(f){const a=ctx(),t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.3,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+1.4);o.connect(g).connect(a.destination);o.start(t);o.stop(t+1.5)}
+function detect(buf,sr,lo,hi){let r=0;for(const v of buf)r+=v*v;if(Math.sqrt(r/buf.length)<.01)return -1;
+ const minL=Math.floor(sr/hi),maxL=Math.floor(sr/lo),n=buf.length-maxL,c=new Float32Array(maxL+2);let mx=0;
+ for(let l=minL;l<=maxL;l++){let s=0;for(let i=0;i<n;i+=2)s+=buf[i]*buf[i+l];c[l]=s;if(s>mx)mx=s}
+ if(mx<=0)return -1;let best=-1;for(let l=minL+1;l<maxL;l++)if(c[l]>.8*mx&&c[l]>=c[l-1]&&c[l]>=c[l+1]){best=l;break}
+ if(best<0)return -1;const a=c[best-1],b=c[best],d=c[best+1],den=a-2*b+d,sh=den?(a-d)/(2*den):0;return sr/(best+sh)}
+async function tStart(){try{const a=ctx();T.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});const src=a.createMediaStreamSource(T.stream);T.an=a.createAnalyser();T.an.fftSize=8192;src.connect(T.an);T.buf=new Float32Array(8192);T.on=true;T.last=0;hist=[];held=0;$('#tgo').textContent='Stop tuner';tLoop()}catch(e){toast('Microphone unavailable. Allow access in your browser and try again.')}}
+function tStop(){T.on=false;T.stream&&T.stream.getTracks().forEach(t=>t.stop());$('#tgo').textContent='Start tuner';$('#nn').textContent='–';$('#nn').classList.remove('ok');$('#nf').textContent='Press start and play a note';$('#nh').textContent='';$('#needle').style.transform='rotate(0deg)';$$('#strr .chip').forEach(c=>c.classList.remove('near'))}
+function tLoop(){if(!T.on)return;requestAnimationFrame(tLoop);const now=performance.now();if(now-T.last<50)return;T.last=now;
+ const S=INS[ins],fs=S.map(s=>mf(s[1])),lo=S.length?Math.min(...fs)*.7:40,hi=S.length?Math.max(...fs)*1.7:1500;
+ T.an.getFloatTimeDomainData(T.buf);const f=detect(T.buf,ac.sampleRate,lo,hi);if(f<0){held=0;return}
+ hist.push(f);if(hist.length>5)hist.shift();const sm=[...hist].sort((a,b)=>a-b)[hist.length>>1];
+ let m,idx=-1;
+ if(S.length){idx=pin>=0?pin:fs.reduce((b,x,i)=>Math.abs(Math.log(sm/x))<Math.abs(Math.log(sm/fs[b]))?i:b,0);m=S[idx][1]}else m=Math.round(69+12*Math.log2(sm/A4));
+ const cents=Math.round(1200*Math.log2(sm/mf(m))),ok=Math.abs(cents)<=5;
+ $('#nn').textContent=NN[((m%12)+12)%12]+(Math.floor(m/12)-1);$('#nn').classList.toggle('ok',ok);
+ $('#nf').textContent=`${sm.toFixed(1)} Hz · ${cents>0?'+':''}${cents} cents`;
+ $('#nh').textContent=ok?'In tune':cents>0?'Too high. Tune down':'Too low. Tune up';
+ $('#needle').style.transform=`rotate(${Math.max(-50,Math.min(50,cents))*.9}deg)`;
+ $$('#strr .chip').forEach((c,i)=>c.classList.toggle('near',i===idx));
+ held=ok?held+1:0;if(held===10)sfx('ok')}
+drawIns();
+$('#insr').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;ins=b.dataset.k;pin=-1;hist=[];drawIns()};
+$('#strr').onclick=e=>{const b=e.target.closest('.chip');if(!b||!b.dataset.i)return;const i=+b.dataset.i;pin=pin===i?-1:i;drawIns();if(pin>=0)tone(mf(INS[ins][i][1]))};
+$('#ref').onchange=e=>{A4=+e.target.value};
+document.body.dataset.sec='met';tabs.forEach(t=>t.addEventListener('click',()=>{document.body.dataset.sec=t.dataset.p;if(P.on&&t.dataset.p!=='pit')pStop();if(T.on&&t.dataset.p!=='tun')tStop()}));
+
+/* tunings and more instruments */
+const nm=m=>NN[((m%12)+12)%12]+(Math.floor(m/12)-1);
+const TUN={
+ Guitar:{'Standard':[40,45,50,55,59,64],'Drop D':[38,45,50,55,59,64],'Half step down':[39,44,49,54,58,63],'Full step down':[38,43,48,53,57,62],'DADGAD':[38,45,50,55,57,62],'Open G':[38,43,50,55,59,62],'Open D':[38,45,50,54,57,62]},
+ Bass:{'Standard':[28,33,38,43],'Drop D':[26,33,38,43],'Half step down':[27,32,37,42],'5-string':[23,28,33,38,43]},
+ Ukulele:{'Standard (GCEA)':[67,60,64,69],'Low G':[55,60,64,69],'Baritone (DGBE)':[50,55,59,64]},
+ Violin:{'Standard':[55,62,69,76]},Viola:{'Standard':[48,55,62,69]},Cello:{'Standard':[36,43,50,57]},Mandolin:{'Standard':[55,62,69,76]},
+ Banjo:{'Open G (5-string)':[50,55,59,62,67],'Double C':[48,55,60,62,67]}};
+const tun={};function setT(k,t){tun[k]=t;INS[k]=TUN[k][t].map(m=>[nm(m),m])}
+for(const k in TUN)setT(k,Object.keys(TUN[k])[0]);
+{const c=INS.Chromatic;delete INS.Chromatic;INS.Chromatic=c}
+function drawTun(){const ts=Object.keys(TUN[ins]||{});$('#tunr').innerHTML=ts.length>1?`<label class="unit">Tuning <select id="tunsel">${ts.map(t=>`<option${t===tun[ins]?' selected':''}>${t}</option>`).join('')}</select></label>`:'';const s=$('#tunsel');if(s)s.onchange=()=>{setT(ins,s.value);pin=-1;hist=[];drawIns()}}
+const _drawIns=drawIns;drawIns=function(){_drawIns();drawTun()};drawIns();
+
+/* pitch detector */
+const P={on:false,pts:[],lo:null,hi:null};
+const cv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888';
+async function pStart(){try{if(T.on)tStop();const a=ctx();P.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});const src=a.createMediaStreamSource(P.stream);P.an=a.createAnalyser();P.an.fftSize=4096;src.connect(P.an);P.buf=new Float32Array(4096);P.on=true;P.last=0;P.pts=[];$('#pgo').textContent='Stop listening';pLoop()}catch(e){toast('Microphone unavailable. Allow access in your browser and try again.')}}
+function pStop(){P.on=false;P.stream&&P.stream.getTracks().forEach(t=>t.stop());$('#pgo').textContent='Start listening';$('#pn').textContent='–';$('#pf').textContent='Sing or play a note'}
+function pLoop(){if(!P.on)return;requestAnimationFrame(pLoop);const now=performance.now();
+ if(now-P.last>=45){P.last=now;P.an.getFloatTimeDomainData(P.buf);const f=detect(P.buf,ac.sampleRate,65,1100);
+  if(f>0){const m=69+12*Math.log2(f/A4),r=Math.round(m),c=Math.round((m-r)*100);P.pts.push([now,m]);$('#pn').textContent=nm(r);$('#pf').textContent=`${f.toFixed(1)} Hz · ${c>0?'+':''}${c} cents`;if(P.lo===null||r<P.lo)P.lo=r;if(P.hi===null||r>P.hi)P.hi=r;$('#prange').textContent=nm(P.lo)+' to '+nm(P.hi)}else P.pts.push([now,null])}
+ pDraw(now)}
+function pDraw(now){const c=$('#pcv'),w=c.clientWidth,h=c.clientHeight,d=devicePixelRatio||1;if(c.width!==Math.round(w*d)){c.width=Math.round(w*d);c.height=Math.round(h*d)}const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,w,h);
+ const W=8000;P.pts=P.pts.filter(p=>now-p[0]<W);const ms=P.pts.filter(p=>p[1]!==null).map(p=>p[1]);let lo=48,hi=72;if(ms.length){lo=Math.min(lo,Math.floor(Math.min(...ms))-2);hi=Math.max(hi,Math.ceil(Math.max(...ms))+2)}
+ const y=m=>h-8-(m-lo)/(hi-lo)*(h-16);g.font='11px sans-serif';g.textBaseline='middle';
+ for(let m=lo;m<=hi;m++){if([1,3,6,8,10].includes(((m%12)+12)%12))continue;g.strokeStyle=cv('--line');g.lineWidth=1;g.beginPath();g.moveTo(34,y(m));g.lineTo(w,y(m));g.stroke();g.fillStyle=cv('--mute');if([0,4,7,9].includes(((m%12)+12)%12))g.fillText(nm(m),2,y(m))}
+ g.strokeStyle=cv('--acc');g.lineWidth=3;g.lineCap='round';g.lineJoin='round';let pen=false;g.beginPath();
+ for(const p of P.pts){if(p[1]===null){pen=false;continue}const x=34+(w-34)*(1-(now-p[0])/W),yy=y(p[1]);if(pen)g.lineTo(x,yy);else{g.moveTo(x,yy);pen=true}}g.stroke()}
+$('#pgo').onclick=()=>P.on?pStop():pStart();
+$('#preset').onclick=()=>{P.lo=P.hi=null;$('#prange').textContent='–'};
+$('#tgo').addEventListener('click',()=>{if(P.on)pStop()});
+
+/* monochrome portrait medallions: original, generic illustrations (no real likenesses) */
+function kid(s){const [hr,hc,pr,ex]=(DD[s.n]||'short x mic').split(' ');const L='#e9e9e9',H='#8a8a8a',D='#111';
+ const ring=(x,y,r,f)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" stroke="${f===H?'none':'#aaa'}" stroke-width="1"/>`;
+ const cl=[[36,34],[41,24],[50,20],[59,24],[64,34],[34,45],[66,45]];
+ const back={long:`<path d="M33 42Q33 19 50 19T67 42V68H33Z" fill="${H}"/>`,bob:`<path d="M34 48V30Q34 19 50 19T66 30V48Z" fill="${H}"/>`,curly:cl.map(p=>ring(p[0],p[1],7.5,H)).join(''),wig:cl.concat([[35,52],[65,52]]).map(p=>ring(p[0],p[1],8,'#f4f4f4')).join('')}[hr]||'';
+ const cap=`<path d="M36 38Q36 21 50 21T64 38Q58 29 50 29T36 38Z" fill="${H}"/>`;
+ const front={short:cap,long:cap,bob:cap,bun:cap+ring(50,16,6,H)}[hr]||'';
+ const exs={crown:`<path d="M38 25l3-10 9 6 9-6 3 10z" fill="${L}" stroke="${D}" stroke-width="1.5"/>`,hat:`<path d="M29 29h42" stroke="${L}" stroke-width="4" stroke-linecap="round"/><path d="M38 29Q38 14 50 14T62 29z" fill="${L}"/>`,glasses:`<circle cx="44.5" cy="40" r="4" fill="none" stroke="${D}" stroke-width="1.8"/><circle cx="55.5" cy="40" r="4" fill="none" stroke="${D}" stroke-width="1.8"/><path d="M48.5 40h3" stroke="${D}" stroke-width="1.8"/>`}[ex]||'';
+ const ic={guitar:`<ellipse cx="76" cy="85" rx="6.5" ry="5.5" fill="${D}"/><path d="M80 81L90 70" stroke="${D}" stroke-width="2.6" stroke-linecap="round"/>`,mic:`<rect x="76" y="68" width="8" height="13" rx="4" fill="${D}"/><path d="M73 79q7 10 14 0M80 88v4" fill="none" stroke="${D}" stroke-width="2" stroke-linecap="round"/>`,piano:`<rect x="70" y="73" width="20" height="14" fill="#fff" stroke="${D}" stroke-width="2"/><path d="M75 73v14M80 73v14M85 73v14" stroke="${D}" stroke-width="1.4"/><path d="M73.5 73v7M78.5 73v7M83.5 73v7" stroke="${D}" stroke-width="3"/>`,trumpet:`<path d="M69 82h14" stroke="${D}" stroke-width="3.2" stroke-linecap="round"/><path d="M83 75l8 7-8 7z" fill="${D}"/>`,violin:`<ellipse cx="78" cy="82" rx="5.5" ry="9" fill="${D}" transform="rotate(35 78 82)"/><path d="M71 91L91 70" stroke="${D}" stroke-width="1.8" stroke-linecap="round"/>`,flute:`<path d="M69 90L91 70" stroke="${D}" stroke-width="3.4" stroke-linecap="round"/>`,drum:`<ellipse cx="80" cy="76" rx="10" ry="4" fill="#fff" stroke="${D}" stroke-width="2"/><path d="M70 76v11q10 5 20 0V76" fill="none" stroke="${D}" stroke-width="2"/>`}[pr]||'';
+ return `<svg viewBox="0 0 100 100" role="img" aria-label="Illustration for ${s.n}"><circle cx="50" cy="50" r="48" fill="${D}" stroke="#fff" stroke-opacity=".4" stroke-width="2"/>${back}<path d="M12.5 80Q16 60 50 60Q84 60 87.5 80A48 48 0 0 1 12.5 80Z" fill="${L}"/><rect x="45" y="50" width="10" height="13" fill="#d0d0d0"/><ellipse cx="50" cy="39" rx="13" ry="15" fill="${L}"/>${front}${exs}<circle cx="80" cy="80" r="17" fill="#fff" stroke="${D}" stroke-width="3"/>${ic}</svg>`}
+
+/* guided tour */
+const TS=[
+{s:'.logo',t:'Welcome to CoreKit',d:'Your practice toolkit in one place. This quick tour shows what each tool does, and you can skip it at any time.'},
+{s:'[data-p=met]',p:'met',t:'Metronome',d:'Keep time from 30 to 240 BPM. Tap tempo to match a song, and choose how many beats are in each bar.'},
+{s:'[data-p=tun]',p:'tun',t:'Tuner',d:'Pick your instrument and tuning, play a string and follow the needle. Tap a string to hear it first.'},
+{s:'[data-p=dro]',p:'dro',t:'Drone',d:'Hold a steady note, or a root and fifth, to train your ear and check your intonation.'},
+{s:'[data-p=pit]',p:'pit',t:'Pitch detector',d:'Sing or play and see your notes traced live on a graph. It also tracks the lowest and highest notes you reach.'},
+{s:'[data-p=tim]',p:'tim',t:'Timer',d:'Set a practice block. Finished sessions are added to your log automatically.'},
+{s:'[data-p=ram]',p:'ram',t:'Tempo ramp',d:'Start slow and let the tempo climb on its own until you reach your target.'},
+{s:'[data-p=log]',p:'log',t:'Practice log',d:'See your week at a glance and add your own sessions.'},
+{s:'[data-p=sto]',p:'sto',t:'Stories',d:'Short stories about musicians from Bach to Billie Eilish, each with a practice tip.'},
+{s:'#snd',t:'Sound and theme',d:'Turn sound effects on or off here, and switch between light and dark with the moon button. The question mark button replays this tour.'}];
+let ti=0,tt=0;
+function tPlace(){const st=TS[ti],el=$(st.s);scrollTo(0,0);el.scrollIntoView({block:'nearest',inline:'center'});clearTimeout(tt);
+ tt=setTimeout(()=>{const r=el.getBoundingClientRect(),pad=6,sp=$('#spot'),tip=$('#tip');
+  Object.assign(sp.style,{left:r.left-pad+'px',top:r.top-pad+'px',width:r.width+pad*2+'px',height:r.height+pad*2+'px'});
+  const w=tip.offsetWidth,h=tip.offsetHeight;let top=r.bottom+pad+14;if(top+h>innerHeight-12)top=Math.max(12,r.top-pad-14-h);
+  tip.style.top=top+'px';tip.style.left=Math.max(16,Math.min(innerWidth-w-16,r.left+r.width/2-w/2))+'px'},st.p?450:60)}
+function tShow(i){ti=i;const st=TS[i];if(st.p)$('[data-p='+st.p+']').click();
+ $('#th').textContent=st.t;$('#tp').textContent=st.d;$('#tdots').innerHTML=TS.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
+ $('#tback').style.visibility=i?'visible':'hidden';$('#tnext').textContent=i===TS.length-1?'Done':'Next';tPlace()}
+function tOpen(){$('#tour').hidden=false;tShow(0);$('#tnext').focus()}
+function tEnd(){clearTimeout(tt);$('#tour').hidden=true;$('[data-p=met]').click();scrollTo(0,0)}
+$('#tnext').onclick=()=>ti<TS.length-1?tShow(ti+1):tEnd();
+$('#tback').onclick=()=>ti&&tShow(ti-1);
+$('#tskip').onclick=tEnd;
+$('#tourbtn').onclick=tOpen;
+addEventListener('keydown',e=>{if($('#tour').hidden)return;if(e.key==='Escape')tEnd();else if(e.key==='ArrowRight')$('#tnext').click();else if(e.key==='ArrowLeft')$('#tback').click()});
+addEventListener('resize',()=>{if(!$('#tour').hidden)tPlace()});
+(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(tOpen,350));
+$('#cards').onclick=e=>{const c=e.target.closest('.card');if(!c)return;const s=ST[c.dataset.i],r=$('#sread');r.innerHTML=`<button class="btn" id="sback">Back to stories</button><div class="doodle big">${kid(s)}</div><h2 style="margin-top:14px">${s.n}</h2><p class="sub">${s.y} · ${s.r}</p><p>${s.t}</p><div class="take"><b>Practice takeaway</b><br>${s.k}</div>`;$('#slist').hidden=true;r.hidden=false;r.style.animation='none';r.offsetWidth;r.style.animation='in .5s cubic-bezier(.2,.8,.2,1)';$('#sback').onclick=()=>{r.hidden=true;$('#slist').hidden=false}};
+</script>
+</body>
+</html>
